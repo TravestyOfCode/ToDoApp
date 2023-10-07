@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ToDoApp.Data;
 
 namespace ToDoApp;
 
@@ -12,6 +15,12 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
+
+        // Add DB Context
+        builder.Services.AddDbContext<AppDbContext>(options =>
+        {
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+        });
 
         var app = builder.Build();
 
