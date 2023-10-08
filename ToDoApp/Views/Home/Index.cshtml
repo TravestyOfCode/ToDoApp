@@ -1,8 +1,32 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<ToDoApp.Data.ToDoList>
+
+@{
+    ViewData["Title"] = "To Do Lists";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>@ViewData["Title"]</h1>
+<hr />
+@foreach(var list in Model)
+{
+    <div>
+        <div class="h2 row">            
+            <div class="col-auto">@list.Title</div>
+            <div class="col-auto">(@list.Items.Where(i => i.IsCompleted).Count() / @list.Items.Count())</div>
+        </div>
+        <div class="container-fluid">
+            @foreach (var item in list.Items)
+            {   
+                <div class="row mb-1 h5">
+                    <div class="form-check col-3">
+                        <input id="item-@item.Id" type="checkbox" class="form-check-input" checked="@item.IsCompleted" />
+                        <label for="item-@item.Id" class="form-check-label strikethrough">@item.Description</label>
+                    </div>                    
+                    <div class="col-1 btn-group align-items-center">
+                        <button type="button" class="btn btn-success">Edit</button>
+                        <button type="button" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            }
+        </div>        
+    </div>
+}
