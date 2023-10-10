@@ -1,0 +1,8 @@
+﻿@model ToDoApp.Data.ToDoList
+
+<div class="col-auto">@Model.Title</div>
+<div class="col">(@Model.Items.Where(i => i.IsCompleted).Count() / @Model.Items.Count())</div>
+<div class="col-auto btn-group">
+    <button class="btn btn-primary" type="button" hx-get="/Home/EditList" hx-vals='{"listId":"@Model.Id"}' hx-target="#list-header-@Model.Id">Edit</button>
+    <button class="btn btn-danger" type="button" hx-confirm="Are you sure you want to delete the @Model.Title list?" hx-delete="/Home/DeleteList" hx-vals='{"listid":"@Model.Id"}' hx-target="#list-@Model.Id">Delete</button>
+</div>

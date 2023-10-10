@@ -2,12 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ToDoApp.Data;
 using ToDoApp.Models;
+using ToDoApp.Utilities;
 
 namespace ToDoApp.Controllers;
 public class HomeController : Controller
@@ -22,18 +24,16 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    public async Task<IActionResult> Index(bool includeCompleted = false, CancellationToken cancellationToken = default)
+    [Route("/")]
+    [Route("[controller]/")]
+    [Route("[controller]/Index")]
+    public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
     {
         try
         {
             IQueryable<ToDoList> query = _dbContext.ToDoLists.Include(p => p.Items);
 
-            if (!includeCompleted)
-            {
-                query = query.Where(p => p.IsCompleted == false);
-            }
-
-            var results = await query.ToListAsync(cancellationToken);
+            var results = await query.OrderByDescending(p => p.Id).ToListAsync(cancellationToken);
 
             return View(results);
         }
@@ -45,9 +45,124 @@ public class HomeController : Controller
 
     }
 
-    public IActionResult Privacy()
+    [HttpGet("[controller]/Index/{listId}")]
+    public async Task<IActionResult> Index(int listId, CancellationToken cancellationToken = default)
     {
-        return View();
+        try
+        {
+            var entity = await _dbContext.ToDoLists.Include(tdl => tdl.Items).SingleOrDefaultAsync(tdl => tdl.Id.Equals(listId), cancellationToken);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("ToDoListPartial", entity);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error getting ToDoList by Id.");
+
+            return StatusCode(500);
+        }
+    }
+
+    public async Task<IActionResult> CreateList(CancellationToken cancellationToken)
+    {
+        try
+        {
+            string title = HttpContext.Request.Headers["HX-Prompt"];
+
+            if (title.IsWhiteSpace())
+            {
+                return StatusCode(400, "Invalid Title");
+            }
+
+            var entity = _dbContext.ToDoLists.Add(new ToDoList() { Title = title, Items = new List<ToDoItem>() });
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return PartialView("NewToDoListPartial", entity.Entity);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error creating new ToDoList.");
+
+            return StatusCode(500);
+        }
+    }
+
+    public async Task<IActionResult> EditList(int listId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var entity = await _dbContext.ToDoLists.SingleOrDefaultAsync(tdl => tdl.Id.Equals(listId), cancellationToken);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("EditToDoListPartial", entity);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error getting edit for ToDoList.");
+
+            return StatusCode(500);
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EditList(int listId, string title, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var entity = await _dbContext.ToDoLists.Include(tdl => tdl.Items).SingleOrDefaultAsync(tdl => tdl.Id.Equals(listId), cancellationToken);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            entity.Title = title;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return PartialView("ToDoListPartial", entity);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error saving ToDoList changes.");
+
+            return StatusCode(500);
+        }
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteList(int listId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var entity = await _dbContext.ToDoLists.SingleOrDefaultAsync(tdl => tdl.Id.Equals(listId), cancellationToken);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.ToDoLists.Remove(entity);
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error deleting ToDoList.");
+
+            return StatusCode(500);
+        }
     }
 
     // Updates a single ToDoItem's IsCompleted property. If isCompleted is 'on' then it is set to true, otherwise false.
@@ -206,6 +321,11 @@ public class HomeController : Controller
             _logger.LogError(ex, "Unexpected error saving new ToDoItem.");
             return StatusCode(500);
         }
+    }
+
+    public IActionResult Privacy()
+    {
+        return View();
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -1,0 +1,17 @@
+﻿@model ToDoApp.Data.ToDoList
+
+<div id="list-@Model.Id">
+    <div id="list-header-@Model.Id" class="h2 row rounded-2 bg-lightgrey p-2 mb-0 mt-4">
+        <partial name="ToDoListPartial" for="@Model" />
+    </div>
+    <div class="container-fluid rounded-1 border border-primary pt-2 pb-2 ps-4">
+        @foreach (var item in Model.Items)
+        {
+            <partial name="ToDoItemPartial" for="@item" />
+        }
+        <div class="row mt-2" id="new-todo-@Model.Id">
+            <button type="button" class="col-auto btn btn-success" hx-get="/Home/Create" hx-target="#new-todo-@Model.Id" hx-vals='{"listId":"@Model.Id"}' hx-swap="outerHTML">Add ToDo</button>
+        </div>
+    </div>
+
+</div>
