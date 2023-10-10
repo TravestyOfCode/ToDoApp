@@ -1,0 +1,10 @@
+﻿@model int
+
+<form id="new-todo-@Model" action="Create" class="row mb-1 h5">
+    <input type="hidden" name="listid" value="@Model" />
+    <input name="description" type="text" class="form-control" value="" />
+    <div class="btn-group col-1 align-items-center">
+        <button type="button" class="btn btn-success" hx-post="/Home/Create" hx-target="#new-todo-@Model" hx-swap="outerHTML">Save</button>
+        <button type="button" class="btn btn-secondary" hx-get="/Home/CancelCreate" hx-target="#new-todo-@Model" hx-swap="outerHTML">Cancel</button>
+    </div>
+</form>

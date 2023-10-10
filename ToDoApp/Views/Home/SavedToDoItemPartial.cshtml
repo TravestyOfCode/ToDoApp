@@ -1,0 +1,7 @@
+﻿@model ToDoApp.Data.ToDoItem
+
+<partial name="ToDoItemPartial" for="@Model" />
+
+<div class="row mt-2" id="new-todo-@Model.ToDoListId">
+    <button type="button" class="col-auto btn btn-success" hx-get="/Home/Create" hx-target="#new-todo-@Model.ToDoListId" hx-vals='{"listId":"@Model.ToDoListId"}' hx-swap="outerHTML">Add ToDo</button>
+</div>

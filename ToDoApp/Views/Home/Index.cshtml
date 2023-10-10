@@ -1,8 +1,35 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<ToDoApp.Data.ToDoList>
+
+@{
+    ViewData["Title"] = "To Do Lists";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <h1 class="col">@ViewData["Title"]</h1>
+    <a href="/Home/Create" class="col-auto btn btn-success align-self-center">New List</a>
 </div>
+<hr />
+@foreach(var list in Model)
+{
+    <div>
+        <div class="h2 row">            
+            <div class="col-auto">@list.Title</div>
+            <div class="col">(@list.Items.Where(i => i.IsCompleted).Count() / @list.Items.Count())</div>
+            <div class="col-auto btn-group">
+                <button class="btn btn-primary" type="button">Edit</button>
+                <button class="btn btn-danger" type="button">Delete</button>
+            </div>
+        </div>
+        <div class="container-fluid rounded-1 border border-primary pt-2 pb-2 ps-4">
+            @foreach (var item in list.Items)
+            {
+                <partial name="ToDoItemPartial" for="@item" />
+            }
+            <div class="row mt-2" id="new-todo-@list.Id">
+                <button type="button" class="col-auto btn btn-success" hx-get="/Home/Create" hx-target="#new-todo-@list.Id" hx-vals='{"listId":"@list.Id"}' hx-swap="outerHTML">Add ToDo</button>
+            </div>
+        </div>
+        
+    </div>
+}
+
