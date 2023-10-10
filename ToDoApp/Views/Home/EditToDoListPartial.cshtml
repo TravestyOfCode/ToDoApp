@@ -1,0 +1,10 @@
+﻿@model ToDoApp.Data.ToDoList
+
+<form action="/Home/EditList" method="post" class="">
+    <input type="hidden" name="listId" value="@Model.Id" />
+    <input type="text" class="form-control" name="title" value="@Model.Title" />
+<div class="col-auto btn-group">
+    <button class="btn btn-success" type="button" hx-post="/Home/EditList" hx-target="#list-header-@Model.Id">Save</button>
+    <button class="btn btn-secondary" type="button" hx-confirm="Are you sure you want to cancel changes?" hx-get="/Home/Index/@Model.Id" hx-target="#list-header-@Model.Id">Cancel</button>
+</div>
+</form>
