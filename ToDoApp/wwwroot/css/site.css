@@ -1,5 +1,5 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
@@ -23,4 +23,8 @@ body {
 
 input[type=checkbox]:checked + label.strikethrough {
     text-decoration: line-through;
+}
+
+.bg-lightgrey {
+    background-color: #aaa;
 }
