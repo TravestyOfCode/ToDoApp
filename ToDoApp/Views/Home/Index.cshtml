@@ -4,29 +4,32 @@
     ViewData["Title"] = "To Do Lists";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="row">
+    <h1 class="col">@ViewData["Title"]</h1>
+    <a href="/Home/Create" class="col-auto btn btn-success align-self-center">New List</a>
+</div>
 <hr />
 @foreach(var list in Model)
 {
     <div>
         <div class="h2 row">            
             <div class="col-auto">@list.Title</div>
-            <div class="col-auto">(@list.Items.Where(i => i.IsCompleted).Count() / @list.Items.Count())</div>
+            <div class="col">(@list.Items.Where(i => i.IsCompleted).Count() / @list.Items.Count())</div>
+            <div class="col-auto btn-group">
+                <button class="btn btn-primary" type="button">Edit</button>
+                <button class="btn btn-danger" type="button">Delete</button>
+            </div>
         </div>
-        <div class="container-fluid">
+        <div class="container-fluid rounded-1 border border-primary pt-2 pb-2 ps-4">
             @foreach (var item in list.Items)
-            {   
-                <div class="row mb-1 h5">
-                    <div class="form-check col-3">
-                        <input id="item-@item.Id" type="checkbox" class="form-check-input" checked="@item.IsCompleted" />
-                        <label for="item-@item.Id" class="form-check-label strikethrough">@item.Description</label>
-                    </div>                    
-                    <div class="col-1 btn-group align-items-center">
-                        <button type="button" class="btn btn-success">Edit</button>
-                        <button type="button" class="btn btn-danger">Delete</button>
-                    </div>
-                </div>
+            {
+                <partial name="ToDoItemPartial" for="@item" />
             }
-        </div>        
+            <div class="row mt-2" id="new-todo-@list.Id">
+                <button type="button" class="col-auto btn btn-success" hx-get="/Home/Create" hx-target="#new-todo-@list.Id" hx-vals='{"listId":"@list.Id"}' hx-swap="outerHTML">Add ToDo</button>
+            </div>
+        </div>
+        
     </div>
 }
+

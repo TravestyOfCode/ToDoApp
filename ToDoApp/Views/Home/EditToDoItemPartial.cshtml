@@ -1,0 +1,10 @@
+﻿@model ToDoApp.Data.ToDoItem
+
+<form id="form-@Model.Id" action="Update" class="row mb-1 h5">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <input name="description" type="text" class="form-control" value="@Model.Description" />
+    <div class="btn-group col-1 align-items-center">
+        <button type="button" class="btn btn-success" hx-post="/Home/Edit" hx-target="#form-@Model.Id">Save</button>
+        <button type="button" class="btn btn-secondary" hx-get="/Home/Cancel" hx-target="#form-@Model.Id" hx-vals='{"id":"@Model.Id"}'>Cancel</button>
+    </div>
+</form>

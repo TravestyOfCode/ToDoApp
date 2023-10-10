@@ -1,0 +1,13 @@
+﻿@model ToDoApp.Data.ToDoItem
+
+<form id="form-@Model.Id" action="Update" class="row mb-1 h5">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <div class="form-check col-3">
+        <input id="item-@Model.Id" name="isCompleted" checked="@Model.IsCompleted" type="checkbox" class="form-check-input" hx-post="/Home/UpdateStatus" />
+        <label for="item-@Model.Id" class="form-check-label strikethrough">@Model.Description</label>
+    </div>
+    <div class="btn-group col-1 align-items-center">
+        <button type="button" class="btn btn-primary" hx-get="/Home/Edit" hx-target="#form-@Model.Id" hx-vals='{"id":"@Model.Id"}'>Edit</button>
+        <button type="button" class="btn btn-danger" hx-delete="/Home/Delete" hx-target="#form-@Model.Id" hx-vals='{"id":"@Model.Id"}' hx-confirm="Are you sure you want to delete this?">Delete</button>
+    </div>
+</form>
